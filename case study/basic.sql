@@ -80,6 +80,8 @@ where year(start_date) = "2021" )
 group by service_id;
 
 -- ex8 - 1
+-- Hiển thị thông tin ho_ten khách hàng có trong hệ thống, với yêu cầu ho_ten không trùng nhau.
+-- Học viên sử dụng theo 3 cách khác nhau để thực hiện yêu cầu trên.
 select distinct customer_name from customer;
 -- ex8 - 2
 select customer_name from customer
@@ -101,6 +103,9 @@ having count >= 2;
 
 
 -- ex9
+-- Thực hiện thống kê doanh thu theo tháng, nghĩa là tương ứng với mỗi tháng trong năm 2021 
+-- thì sẽ có bao nhiêu khách hàng thực hiện đặt phòng.
+
 select month(start_date) as months, count(customer_id) as num_of_customers
 from contract
 where year(start_date) = "2021"
@@ -108,6 +113,10 @@ group by months
 order by months ASC;
 
 -- ex10
+-- Hiển thị thông tin tương ứng với từng hợp đồng thì đã sử dụng bao nhiêu dịch vụ đi kèm. 
+-- Kết quả hiển thị bao gồm ma_hop_dong, ngay_lam_hop_dong, ngay_ket_thuc, tien_dat_coc, so_luong_dich_vu_di_kem 
+-- (được tính dựa trên việc sum so_luong ở dich_vu_di_kem).
+
 select c.contract_id, start_date, end_date, deposit, ifnull(sum(quantity),0) as total
 from contract c
 left join contract_details cd on c.contract_id = cd.contract_id
