@@ -123,6 +123,9 @@ left join contract_details cd on c.contract_id = cd.contract_id
 group by c.contract_id;
 
 -- ex11
+-- Hiển thị thông tin các dịch vụ đi kèm đã được sử dụng bởi những khách hàng có ten_loai_khach là “Diamond” 
+-- và có dia_chi ở “Vinh” hoặc “Quảng Ngãi”.
+
 select cd.complimentary_id, complimentary_name
 from contract_details cd
 join contract c on cd.contract_id = c.contract_id
@@ -132,6 +135,11 @@ join customer_type ct on cus.customer_type_id = ct.customer_type_id
 where customer_type_name = "Diamond" and address regexp 'Vinh|Quãng Ngãi';
 
 -- ex12
+-- Hiển thị thông tin ma_hop_dong, ho_ten (nhân viên), ho_ten (khách hàng), so_dien_thoai (khách hàng), 
+-- ten_dich_vu, so_luong_dich_vu_di_kem (được tính dựa trên việc sum so_luong ở dich_vu_di_kem), 
+-- tien_dat_coc của tất cả các dịch vụ đã từng được khách hàng đặt vào 3 tháng cuối năm 2020 
+-- nhưng chưa từng được khách hàng đặt vào 6 tháng đầu năm 2021.
+
 select c.contract_id, employee_name, customer_name, phone_num as customer_phone, 
 service_name, ifnull(sum(quantity),0) as total, deposit, start_date
 from contract c
@@ -158,6 +166,9 @@ delete from contract
 where contract_id = 13;
 
 -- ex13
+-- Hiển thị thông tin các Dịch vụ đi kèm được sử dụng nhiều nhất bởi các Khách hàng đã đặt phòng.
+--  (Lưu ý là có thể có nhiều dịch vụ có số lần sử dụng nhiều như nhau).
+
 select cd.complimentary_id, complimentary_name, sum(quantity) as num_of_uses
 from contract_details cd
 left join complimentary com on com.complimentary_id = cd.complimentary_id
@@ -170,6 +181,10 @@ order by num_of_uses DESC
 limit 1);
 
 -- ex14
+-- Hiển thị thông tin tất cả các Dịch vụ đi kèm chỉ mới được sử dụng một lần duy nhất. 
+-- Thông tin hiển thị bao gồm ma_hop_dong, ten_loai_dich_vu, ten_dich_vu_di_kem, so_lan_su_dung 
+-- (được tính dựa trên việc count các ma_dich_vu_di_kem).
+
 select cd.contract_id, service_type_name,complimentary_name, count(cd.complimentary_id) as num_of_uses 
 from contract_details cd
 join contract c on c.contract_id = cd.contract_id
@@ -181,6 +196,9 @@ having num_of_uses = 1
 order by contract_id;
 
 -- ex15
+-- Hiển thi thông tin của tất cả nhân viên bao gồm ma_nhan_vien, ho_ten, ten_trinh_do, ten_bo_phan, 
+-- so_dien_thoai, dia_chi mới chỉ lập được tối đa 3 hợp đồng từ năm 2020 đến 2021.
+
 select e.employee_id, employee_name, edu_name, falcuty_name, phone_number, address
 from employee e
 left join education_background eb on e.edu_id = eb.edu_id
@@ -194,6 +212,8 @@ order by employee_id ;
 
 
 -- ex16
+-- Xóa những Nhân viên chưa từng lập được hợp đồng nào từ năm 2019 đến năm 2021.
+
 -- delete employees with no contract from 2019 - 2021
 select employee_id, employee_name
 from employee
@@ -210,6 +230,9 @@ where year(start_date) in ("2023") or year(start_date) is null);
 
 
 -- ex17
+-- Cập nhật thông tin những khách hàng có ten_loai_khach từ Platinum lên Diamond, 
+-- chỉ cập nhật những khách hàng đã từng đặt phòng với Tổng Tiền thanh toán trong năm 2021 là lớn hơn 10.000.000 VNĐ.
+
 update customer cus
 set cus.customer_type_id = 1
 where cus.customer_id = 
@@ -231,6 +254,8 @@ having sum(hiring_cost) >= 10000000) as temp_customer_table -- temporary table c
 -- To solve this problem, you have to wrap the inner select inside another select (***): why? - (link)
 
 -- ex18
+-- Xóa những khách hàng có hợp đồng trước năm 2021 (chú ý ràng buộc giữa các bảng).
+
 SET FOREIGN_KEY_CHECKS = 0; -- to disable them
 delete from customer 
 where customer_id in
@@ -243,6 +268,8 @@ SET FOREIGN_KEY_CHECKS = 1; -- to re-enable them
 
 
 -- ex19
+-- Cập nhật giá cho các dịch vụ đi kèm được sử dụng trên 10 lần trong năm 2020 lên gấp đôi.
+
 update complimentary
 set price = price * 2 
 where complimentary_id = 
@@ -258,6 +285,9 @@ having sum(quantity) > 10) as temp_complimentary_table)
 
 
 -- ex20
+-- Hiển thị thông tin của tất cả các nhân viên và khách hàng có trong hệ thống,
+-- thông tin hiển thị bao gồm id (ma_nhan_vien, ma_khach_hang), ho_ten, email, so_dien_thoai, ngay_sinh, dia_chi.
+
 select employee_id as ID, employee_name, email, phone_number, address
 from employee
 union
